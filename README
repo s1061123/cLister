@@ -1,0 +1,63 @@
+
+cLister, list up function in C source code. Ver 0.8 (2011-10-28)
+
+Tomofumi Hayashi (s1061123)
+--------------------------------------------------------------------------
+
+cLister is very simple "grep for C source code". This program parses given C 
+source code with C parser, frontC of CIL (*1), then do following things. 
+
+ - list up function name in source code.
+ - list up function name with declaration in source code.
+ - generate dot file to write call-graph for graphviz
+ - list up functions which the specific function calls
+ - list up functions where the specific function is called
+
+*1: CIL: C Intermediate Language, http://cil.sourceforge.net/
+
+Prerequisites:
+ These should be up-to-date version.
+ - OCaml (http://caml.inria.fr/)
+ - CIL (http://cil.sourceforge.net)
+
+How to compile
+===============
+
+Step0/Prerequisite
+---------------------
+ - Build and install OCaml.
+ - Build CIL (no need to install)
+
+Step1
+------
+ Add symbolic link to compiled cil directory.
+ $ cd cLister
+ $ ln -s /foobar/cil cil
+
+Step2
+------
+ Build cLister
+  Note: If your PC is not Linux, change ARCH in Makefile.
+ $ make
+
+Step3
+-----
+ Copy cLister and cLister.bin to any directory you want.
+ $ cp cLister.bin cLister ~/usr/bin
+
+Usage
+======
+ TBD. Please see help, run without any argument.
+
+usage: ./cLister
+   cLister <filename>
+       List up function declaration
+   cLister funname <filename> 
+       List up function name 
+   cLister dotcaller <filename> 
+       Wrote .dot for graphviz
+   cLister caller <filename> <func name>
+       List up function name that <func name> calls
+   cLister callee <filename> <func name>
+       List up function that calls <func name>
+

@@ -1,0 +1,78 @@
+#!/usr/pkg/bin/perl
+use strict;
+use FindBin;
+use File::stat;
+
+# Assume that this script and cLister.bin are in same path.
+my $bin_name = "cLister.bin";
+my $bin_path = $FindBin::Bin;
+my $bin = $bin_path . "/" . $bin_name;
+
+# Make the flag 1 if you want to preprocess the code (gcc -E)
+my $preprocess = 0;
+my $tempfile;
+# CFLAGS for pre-process (available only if $preprocess = 1)
+my $cflags = "-I/usr/pkg/include";
+
+
+#print usage
+sub print_usage {
+    print <<EOL;
+usage: $0
+   cLister <filename>
+       List up function declaration
+   cLister funname <filename> 
+       List up function name 
+   cLister dotcaller <filename> 
+       Wrote .dot for graphviz
+   cLister caller <filename> <func name>
+       List up function name that <func name> calls
+   cLister callee <filename> <func name>
+       List up function that calls <func name>
+EOL
+}
+
+# If need some process (extract "#include <...>"), fill something
+sub pre_process {
+    my $filename = shift;
+
+    if ($preprocess) {
+	$tempfile = `mktemp`;
+	chomp($tempfile);
+	print `gcc -o $tempfile -E $cflags $filename`;
+	return $tempfile;
+    } else {
+	return $filename;
+    }
+}
+
+sub post_process {
+    if ($preprocess) {
+	print `rm -f $tempfile`;
+    }
+}
+
+#Check cLister.bin...
+if (!stat($bin)) {
+    print "$bin is not exist. May need to compile...\n";
+    exit;
+}
+
+if ($#ARGV == 0) {
+    my $filename = pre_process($ARGV[0]);
+    print `$bin $filename`;
+} elsif ($#ARGV == 1) {
+    my $filename = pre_process($ARGV[1]);
+    print `$bin $ARGV[0] $filename`;
+} elsif ($#ARGV == 2) {
+    my $filename = pre_process($ARGV[1]);
+    print `$bin $ARGV[0] $filename $ARGV[2]`;
+} else {
+    print_usage;
+    exit;
+}
+post_process;
+
+# flush stdout
+$| = 1;
+print "";
